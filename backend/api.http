@@ -1,0 +1,27 @@
+GET http://localhost:3000/routes
+
+###
+GET http://localhost:3000/routes/6056692616ee4101bf469501
+
+###
+POST http://localhost:3000/routes
+Content-Type: application/json
+
+{
+    "name": "rota 1",
+    "startPosition": {"lat": 0, "lng": 0},
+    "endPosition": {"lat": 0, "lng": 0}
+}
+
+###
+PATCH http://localhost:3000/routes/6057bd75997ca3045efaf850
+Content-Type: application/json
+
+{
+    "name": "rota 11111111",
+    "startPosition": {"lat": 11, "lng": 0},
+    "endPosition": {"lat": 0, "lng": 0}
+}
+
+###
+DELETE http://localhost:3000/routes/6057bd75997ca3045efaf850
