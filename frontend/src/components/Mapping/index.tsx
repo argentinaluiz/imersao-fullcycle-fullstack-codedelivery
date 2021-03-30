@@ -6,7 +6,7 @@ import { makeCarIcon, makeMarkerIcon, Map } from "../../util/map";
 import { getCurrentPosition } from "../../util/geolocation";
 import { Button, Grid, makeStyles, MenuItem, Select } from "@material-ui/core";
 import { Route } from "../../util/models";
-import { sample } from "lodash";
+import { sample, shuffle } from "lodash";
 import { useSnackbar } from "notistack";
 import { RouteExistsError } from "../../errors/route-exists.error";
 import { Navbar } from "../Navbar";
@@ -25,6 +25,8 @@ const colors = [
   "#c2185b",
   "#FFCD00",
   "#3e2723",
+  "#03a9f4",
+  "#827717"
 ];
 
 const useStyles = makeStyles({
@@ -59,7 +61,7 @@ const Mapping = () => {
 
   const finishRoute = React.useCallback(
     (id: string) => {
-      const route = routes.find((route) => routeIdSelected === route.id);
+      const route = routes.find((route) => routeIdSelected == route.id);
       enqueueSnackbar(`${route?.title} finalizou!`, { variant: "success" });
       mapRef.current?.removeRoute(id);
     },
@@ -67,7 +69,15 @@ const Mapping = () => {
   );
 
   useEffect(() => {
-    console.log(socketIORef);
+    return () => {
+      if (socketIORef.current?.connected) {
+        socketIORef.current?.disconnect();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log(socketIORef, socketIORef.current?.connected);
     if (socketIORef.current?.connected) {
       return;
     }
@@ -95,16 +105,13 @@ const Mapping = () => {
         }
       }
     );
-    return () => {
-      socketIORef.current?.disconnect();
-    };
   }, [finishRoute]);
 
   const addRoute = React.useCallback(
     async (event) => {
       event.preventDefault();
       const route = routes.find((route) => routeIdSelected === route.id);
-      const color = sample(colors) as string;
+      const color = sample(shuffle(colors)) as string;
       try {
         mapRef.current?.addRoute(
           route!.id,
