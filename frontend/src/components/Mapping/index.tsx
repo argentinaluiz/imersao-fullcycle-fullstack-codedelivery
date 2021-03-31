@@ -61,11 +61,11 @@ const Mapping = () => {
 
   const finishRoute = React.useCallback(
     (id: string) => {
-      const route = routes.find((route) => routeIdSelected == route.id);
+      const route = routes.find((route) => id === route.id);
       enqueueSnackbar(`${route?.title} finalizou!`, { variant: "success" });
       mapRef.current?.removeRoute(id);
     },
-    [routes, routeIdSelected, enqueueSnackbar]
+    [routes, enqueueSnackbar]
   );
 
   useEffect(() => {
