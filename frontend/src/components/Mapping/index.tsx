@@ -26,7 +26,7 @@ const colors = [
   "#FFCD00",
   "#3e2723",
   "#03a9f4",
-  "#827717"
+  "#827717",
 ];
 
 const useStyles = makeStyles({
@@ -61,7 +61,11 @@ const Mapping = () => {
 
   const finishRoute = React.useCallback(
     (id: string) => {
-      const route = routes.find((route) => id === route.id);
+      console.log("vvvvvvv", routes);
+      const route = routes.find((route) => {
+        console.log(id, route.id);
+        return id === route.id;
+      });
       enqueueSnackbar(`${route?.title} finalizou!`, { variant: "success" });
       mapRef.current?.removeRoute(id);
     },
@@ -87,24 +91,27 @@ const Mapping = () => {
       console.log("conectou");
       socketIORef.current?.emit("join", { teste: "test" });
     });
+  }, []);
 
-    socketIORef.current.on(
-      "new-position",
-      (data: {
-        routeId: string;
-        position: [number, number];
-        finished: boolean;
-      }) => {
-        mapRef.current!.moveCurrentMarker(data.routeId, {
-          lat: data.position[0],
-          lng: data.position[1],
-        });
+  useEffect(() => {
+    const handler = (data: {
+      routeId: string;
+      position: [number, number];
+      finished: boolean;
+    }) => {
+      mapRef.current!.moveCurrentMarker(data.routeId, {
+        lat: data.position[0],
+        lng: data.position[1],
+      });
 
-        if (data.finished) {
-          finishRoute(data.routeId);
-        }
+      if (data.finished) {
+        finishRoute(data.routeId);
       }
-    );
+    };
+    socketIORef.current?.on("new-position", handler);
+    return () => {
+      socketIORef.current?.off("new-position", handler);
+    };
   }, [finishRoute]);
 
   const addRoute = React.useCallback(
